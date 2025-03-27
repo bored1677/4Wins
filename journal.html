@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --base-clr: #11121a;
+    --line-clr: #42434a;
+    --hover-clr: #222533;
+    --text-clr: #e6e6ef;
+    --accent-clr: #5e63ff;
+    --secondary-text-clr: #b0b3c1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.wrapper {
+    position: relative;
+    width: 450px;
+    max-height: 550px; /* Restrict height */
+    background-color: #ffffff;
+    border-radius: 15px;
+    border: 1px solid var(--accent-clr);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    overflow-y: auto; /* Enables vertical scrolling */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sticky button container */
+.sticky-container {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Match background */
+    padding: 10px;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid var(--line-clr);
+}
+
+#new-entry {
+    width: 100%;
+    background-color: var(--accent-clr);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: 0.3s ease;
+}
+
+/* Header */
+.title-journal {
+    text-align: center;
+    color: var(--base-clr);
+    font-size: 20px;
+}
+
+/* Button Styling */
+button {
+    background-color: var(--accent-clr);
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background-color: #454ae4;
+    transform: scale(1.05);
+}
+
+/* Form Styling */
+#add-entry-form {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: var(--line-clr);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+#entry-text {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid var(--accent-clr);
+    border-radius: 5px;
+    resize: none;
+    font-size: 1rem;
+}
+
+#save-entry {
+    align-self: flex-end;
+}
+
+/* Journal Entries */
+.journal-entries {
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.entry {
+    background-color: var(--hover-clr);
+    color: var(--text-clr);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent-clr);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.entry strong {
+    font-size: 0.9rem;
+    color: var(--secondary-text-clr);
+}
+
+.entry p {
+    font-size: 1rem;
+}
+
+.entry button {
+    margin-top: 5px;
+    padding: 5px;
+    font-size: 0.85rem;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: var(--base-clr);
+    color: var(--text-clr);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    font-family: 'Poppins', sans-serif;
+}
+
+#sidebar {
+    box-sizing: border-box;
+    height: 100vh;
+    width: 250px;
+    padding: 5px 1em;
+    background-color: var(--base-clr);
+    border-right: 1px solid var(--line-clr);
+    position: sticky;
+    top: 0;
+    align-self: start;
+    transition: 300ms ease-in-out;
+    overflow: hidden;
+}
+
+#sidebar.close {
+    padding: 5px;
+    width: 60px;
+}
+
+#sidebar.close .logo,
+#sidebar.close a span {
+    opacity: 0;
+    width: 0;
+    transition: opacity 300ms ease-in-out, width 300ms ease-in-out;
+}
+
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+#sidebar > ul > li:first-child {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+    align-items: center;
+}
+
+#sidebar > ul > li:first-child .logo {
+    font-weight: 600;
+    transition: opacity 300ms ease-in-out, width 300ms ease-in-out;
+}
+
+#sidebar a, #sidebar .dropdown-btn, #sidebar .logo {
+    border-radius: .5em;
+    padding: .85em;
+    text-decoration: none;
+    color: var(--text-clr);
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    transition: background-color 0.3s ease;
+}
+
+#sidebar svg {
+    flex-shrink: 0;
+    fill: var(--text-clr);
+    transition: fill 0.3s ease;
+}
+
+#sidebar a span {
+    flex-grow: 1;
+    transition: opacity 300ms ease-in-out, width 300ms ease-in-out;
+}
+
+#sidebar a:hover {
+    background-color: var(--hover-clr);
+}
+
+#sidebar ul li.current a {
+    background-color: var(--accent-clr);
+    color: white;
+}
+
+#sidebar ul li.current svg {
+    fill: white;
+}
+
+#toggle-btn {
+    margin-left: auto;
+    padding: 1em;
+    border: none;
+    border-radius: .5em;
+    background: none;
+    cursor: pointer;
+}
+
+#toggle-btn svg {
+    transition: rotate 150ms ease;
+}
+
+#toggle-btn:hover {
+    background-color: var(--hover-clr);
+}
+
+.rotate svg:last-child {
+    rotate: 180deg;
+}
+
+#sidebar .sub-menu {
+    display: none;
+}
+
+#sidebar .sub-menu.show {
+    display: block;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+    </style>
+</head>
+<body>
+<nav id="sidebar">
+    <ul>
+        <li>
+            <span class="logo">4Wins</span>
+            <button onClick="toggleSidebar()" id="toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                    <path d="M440-240 200-480l240-240 56 56-183 184 183 184-56 56Zm264 0L464-480l240-240 56 56-183 184 183 184-56 56Z"/>
+                </svg>
+            </button>
+        </li>
+        <li class="active">
+            <a href="/YEAREND/main/home/main.php"> <!-- Fixed path -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                    <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/>
+                </svg>
+                <span>Home</span>
+            </a>
+        </li>
+        <li>
+            <a href="/YEAREND/main/calendar/calendar.php"> <!-- Fixed path -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                    <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/>
+                </svg>
+                <span>Calendar</span>
+            </a>
+        </li>
+        <li>
+            <a href="/YEAREND/main/journal/journal.php"> <!-- Fixed path -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                    <path d="M160-400v-80h280v80H160Zm0-160v-80h440v80H160Zm0-160v-80h440v80H160Zm360 560v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q8 9 12.5 20t4.5 22q0 11-4 22.5T863-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/>
+                </svg>
+                <span>Journal</span>
+            </a>
+        </li>
+        <li>
+        <a href="/YEAREND/main/profile/profile.php"> <!-- Fixed path -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                    <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+                </svg>
+                <span>Profile</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<main>
+    <div class="wrapper">
+        <div class="form-header">
+            <div class="title-journal">Journal</div>
+        </div>
+        <div class="sticky-container">
+            <button id="new-entry">Add New Journal Entry</button>
+        </div>        
+        <div id="add-entry-form">
+            <form action="" class="entry-form" autocomplete="off">
+                <div class="input-box">
+                    <textarea id="entry-text" rows="5" placeholder="Write your journal entry..." required></textarea>
+                    <button class="save-button" id="save-entry">Save Entry </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="journal-entries"></div>
+    </div>
+</main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const newEntryButton = document.getElementById("new-entry");
+    const addEntryForm = document.getElementById("add-entry-form");
+    const saveEntryButton = document.getElementById("save-entry");
+    const entryText = document.getElementById("entry-text");
+    const journalEntries = document.getElementById("journal-entries");
+    
+    let entries = JSON.parse(localStorage.getItem("journal")) || [];
+    renderEntries();
+
+    newEntryButton.addEventListener("click", () => {
+        addEntryForm.style.display = "block";
+    });
+
+    saveEntryButton.addEventListener("click", () => {
+        const text = entryText.value.trim();
+        if (text) {
+            const entry = { id: Date.now(), text, date: new Date().toLocaleString() };
+            entries.push(entry);
+            localStorage.setItem("journal", JSON.stringify(entries));
+            entryText.value = "";
+            addEntryForm.style.display = "none";
+            renderEntries();
+        }
+    });
+
+    function renderEntries() {
+        journalEntries.innerHTML = "";
+        entries.forEach(entry => {
+            const entryDiv = document.createElement("div");
+            entryDiv.classList.add("entry");
+            entryDiv.innerHTML = `<strong>${entry.date}</strong><p>${entry.text}</p>`;
+            
+            const editButton = document.createElement("button");
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => editEntry(entry.id));
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => deleteEntry(entry.id));
+            
+            entryDiv.appendChild(editButton);
+            entryDiv.appendChild(deleteButton);
+            journalEntries.appendChild(entryDiv);
+        });
+    }
+
+    function editEntry(id) {
+        const entry = entries.find(e => e.id === id);
+        const newText = prompt("Edit your entry:", entry.text);
+        if (newText !== null) {
+            entry.text = newText;
+            localStorage.setItem("journal", JSON.stringify(entries));
+            renderEntries();
+        }
+    }
+
+    function deleteEntry(id) {
+        entries = entries.filter(e => e.id !== id);
+        localStorage.setItem("journal", JSON.stringify(entries));
+        renderEntries();
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const addEntryBtn = document.getElementById("add-entry");
+    const saveEntryBtn = document.getElementById("save-entry");
+    const journalForm = document.getElementById("journal-form");
+    const journalEntries = document.getElementById("journal-entries");
+    const loadMoreBtn = document.createElement("button");
+
+    loadMoreBtn.textContent = "Load More";
+    loadMoreBtn.style.display = "none"; // Hidden by default
+    loadMoreBtn.addEventListener("click", showMoreEntries);
+    journalEntries.after(loadMoreBtn);
+
+    let entries = JSON.parse(localStorage.getItem("journalEntries")) || [];
+    let visibleCount = 5; // Number of initially visible entries
+
+    function displayEntries() {
+        journalEntries.innerHTML = "";
+        const limitedEntries = entries.slice(0, visibleCount); // Show only a portion
+
+        limitedEntries.forEach((entry, index) => {
+            const entryDiv = document.createElement("div");
+            entryDiv.classList.add("entry");
+            entryDiv.innerHTML = `
+                <p><strong>${entry.date}</strong></p>
+                <p>${entry.content}</p>
+                <button onclick="editEntry(${index})">Edit</button>
+                <button onclick="deleteEntry(${index})">Delete</button>
+            `;
+            journalEntries.appendChild(entryDiv);
+        });
+
+        // Show "Load More" button if there are more than visibleCount entries
+        if (entries.length > visibleCount) {
+            loadMoreBtn.style.display = "block";
+        } else {
+            loadMoreBtn.style.display = "none";
+        }
+
+        localStorage.setItem("journalEntries", JSON.stringify(entries));
+    }
+
+    function showMoreEntries() {
+        visibleCount += 5; // Increase the number of visible entries
+        displayEntries();
+    }
+
+    addEntryBtn.addEventListener("click", function () {
+        journalForm.style.display = "block";
+    });
+
+    saveEntryBtn.addEventListener("click", function () {
+        const content = document.getElementById("entry-content").value;
+        if (content.trim() === "") return;
+
+        const newEntry = {
+            date: new Date().toLocaleDateString(),
+            content: content,
+        };
+
+        entries.unshift(newEntry); // Add new entry at the top
+        visibleCount = 5; // Reset visible count to ensure only 5 are shown
+        document.getElementById("entry-content").value = ""; // Clear input
+        journalForm.style.display = "none";
+
+        displayEntries();
+    });
+
+    function deleteEntry(index) {
+        entries.splice(index, 1);
+        visibleCount = 5; // Reset visible count after deletion
+        displayEntries();
+    }
+
+    function editEntry(index) {
+        const newContent = prompt("Edit your entry:", entries[index].content);
+        if (newContent !== null) {
+            entries[index].content = newContent;
+            displayEntries();
+        }
+    }
+
+    displayEntries();
+});
+
+     // Toggle sidebar function
+     function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('close');
+        }
+    </script>
+</body>
+</html>
